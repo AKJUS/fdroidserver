@@ -2662,6 +2662,22 @@ class CommonTest(SetUpTearDownMixin, unittest.TestCase):
             self.assertIsNotNone(vcs.getref("1.1.1"))
             self.assertIsNone(vcs.getref("invalid"))
 
+    def test_vcs_git_getref_with_at_tag(self):
+        """https://github.com/gitpython-developers/GitPython/issues/2135"""
+
+        os.chdir(self.testdir)
+        repo = git.Repo.init(Path.cwd())
+        tag = "@standardnotes/mobile@3.58.252"
+        f = Path("test")
+        f.write_text(tag)
+        repo.index.add([str(f)])
+        repo.index.commit("foo")
+        repo.create_tag(tag)
+
+        vcs = fdroidserver.common.vcs_git(None, Path.cwd())
+
+        self.assertIsNotNone(vcs.getref(tag))
+
     def test_get_release_filename(self):
         app = fdroidserver.metadata.App()
         app.id = 'test.app'
