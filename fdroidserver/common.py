@@ -1856,6 +1856,12 @@ class vcs_git(vcs):
             return repo.commit(revname).hexsha
         except git.BadName:
             return None
+        except (TypeError, ValueError):
+            # workaround https://github.com/gitpython-developers/GitPython/issues/2135
+            try:
+                return repo.tag(revname).commit.hexsha
+            except git.BadName:
+                return None
 
 
 class vcs_gitsvn(vcs):
